@@ -1,0 +1,18 @@
+#include<iostream>
+using namespace std;
+int main() {
+    char ch;
+    cout << "Enter a character: ";
+    cin >> ch;
+    if (isalpha(ch)) {
+        if (tolower(ch) == 'a' || tolower(ch) == 'e' || tolower(ch) == 'i' || tolower(ch) == 'o' || tolower(ch) == 'u')
+            cout << ch << " is a vowel." << endl;
+        else
+            cout << ch << " is a consonant." << endl;
+    } else if (isdigit(ch))
+        cout << ch << " is a digit." << endl;
+    else
+        cout << ch << " is a special character." << endl;
+    return 0;
+  
+}
