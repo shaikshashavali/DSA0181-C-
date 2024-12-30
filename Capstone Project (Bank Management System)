@@ -1,0 +1,263 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+
+struct Transaction {
+    string type;
+    double amount;
+};
+
+class Account {
+private:
+    string username;
+    string password;
+    double balance;
+    vector<Transaction> transactionHistory;
+
+public:
+    Account(string uname, string pwd) : username(uname), password(pwd), balance(0.0) {}
+
+    bool authenticate(string uname, string pwd) {
+        return username == uname && password == pwd;
+    }
+
+    void deposit(double amount) {
+        balance += amount;
+        Transaction t = {"Deposit", amount};
+        transactionHistory.push_back(t);
+        cout << "\nAmount deposited successfully. New balance: $" << balance << endl;
+    }
+
+    void withdraw(double amount) {
+        if (amount > balance) {
+            cout << "\nInsufficient balance!" << endl;
+            return;
+        }
+        balance -= amount;
+        Transaction t = {"Withdrawal", amount};
+        transactionHistory.push_back(t);
+        cout << "\nAmount withdrawn successfully. New balance: $" << balance << endl;
+    }
+
+    void showTransactionHistory() {
+        cout << "\nTransaction History:" << endl;
+        for (size_t i = 0; i < transactionHistory.size(); ++i) {
+            cout << transactionHistory[i].type << " - $" << fixed << setprecision(2) << transactionHistory[i].amount << endl;
+        }
+    }
+
+    double getBalance() const {
+        return balance;
+    }
+
+    void viewBalance() const {
+        cout << "\nCurrent Balance: $" << fixed << setprecision(2) << balance << endl;
+    }
+};
+
+// Loan system class
+class Loan {
+private:
+    double loanAmount;
+    double interestRate;
+    bool activeLoan;
+
+public:
+    Loan() : loanAmount(0), interestRate(5.0), activeLoan(false) {}
+
+    void applyForLoan(double amount) {
+        if (activeLoan) {
+            cout << "\nYou already have an active loan!" << endl;
+            return;
+        }
+        loanAmount = amount;
+        activeLoan = true;
+        cout << "\nLoan approved for $" << loanAmount << " at an interest rate of " << interestRate << "% annually." << endl;
+    }
+
+    void showLoanDetails() {
+        if (!activeLoan) {
+            cout << "\nNo active loan." << endl;
+            return;
+        }
+        cout << "\nLoan Amount: $" << loanAmount << endl;
+        cout << "Interest Rate: " << interestRate << "%" << endl;
+    }
+};
+
+// Fixed Deposit class
+class FixedDeposit {
+private:
+    double fdAmount;
+    double interestRate;
+    int tenure;
+
+public:
+    FixedDeposit() : fdAmount(0), interestRate(7.0), tenure(0) {}
+
+    void createFixedDeposit(double amount, int years) {
+        fdAmount = amount;
+        tenure = years;
+        cout << "\nFixed Deposit created for $" << fdAmount << " for " << tenure << " years at " << interestRate << "% interest rate." << endl;
+    }
+
+    void showFDDetails() {
+        if (fdAmount == 0) {
+            cout << "\nNo Fixed Deposit found." << endl;
+            return;
+        }
+        cout << "\nFixed Deposit Amount: $" << fdAmount << endl;
+        cout << "Tenure: " << tenure << " years" << endl;
+        cout << "Interest Rate: " << interestRate << "%" << endl;
+    }
+};
+
+// Main function
+int main() {
+    vector<Account> accounts;
+    Loan loanSystem;
+    FixedDeposit fdSystem;
+
+    int choice;
+    string username, password;
+    double amount;
+    int years;
+
+    Account *loggedInAccount = NULL;
+
+    do {
+        cout << "\n=== Bank Management System ===";
+        cout << "\n1. Create Account";
+        cout << "\n2. Login";
+        cout << "\n3. Deposit";
+        cout << "\n4. Withdraw";
+        cout << "\n5. View Transaction History";
+        cout << "\n6. Apply for Loan";
+        cout << "\n7. View Loan Details";
+        cout << "\n8. Create Fixed Deposit";
+        cout << "\n9. View Fixed Deposit Details";
+        cout << "\n10. View Balance";
+        cout << "\n11. Logout";
+        cout << "\n12. Exit";
+        cout << "\nEnter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "\nEnter username: ";
+                cin >> username;
+                cout << "Enter password: ";
+                cin >> password;
+                accounts.push_back(Account(username, password));
+                cout << "\nAccount created successfully!" << endl;
+                break;
+
+            case 2:
+                if (loggedInAccount) {
+                    cout << "\nAlready logged in!" << endl;
+                    break;
+                }
+                cout << "\nEnter username: ";
+                cin >> username;
+                cout << "Enter password: ";
+                cin >> password;
+                for (size_t i = 0; i < accounts.size(); ++i) {
+                    if (accounts[i].authenticate(username, password)) {
+                        loggedInAccount = &accounts[i];
+                        cout << "\nLogin successful!" << endl;
+                        break;
+                    }
+                }
+                if (!loggedInAccount) {
+                    cout << "\nInvalid credentials." << endl;
+                }
+                break;
+
+            case 3:
+                if (!loggedInAccount) {
+                    cout << "\nPlease login first!" << endl;
+                    break;
+                }
+                cout << "\nEnter amount to deposit: $";
+                cin >> amount;
+                loggedInAccount->deposit(amount);
+                break;
+
+            case 4:
+                if (!loggedInAccount) {
+                    cout << "\nPlease login first!" << endl;
+                    break;
+                }
+                cout << "\nEnter amount to withdraw: $";
+                cin >> amount;
+                loggedInAccount->withdraw(amount);
+                break;
+
+            case 5:
+                if (!loggedInAccount) {
+                    cout << "\nPlease login first!" << endl;
+                    break;
+                }
+                loggedInAccount->showTransactionHistory();
+                break;
+
+            case 6:
+                if (!loggedInAccount) {
+                    cout << "\nPlease login first!" << endl;
+                    break;
+                }
+                cout << "\nEnter loan amount: $";
+                cin >> amount;
+                loanSystem.applyForLoan(amount);
+                break;
+
+            case 7:
+                loanSystem.showLoanDetails();
+                break;
+
+            case 8:
+                if (!loggedInAccount) {
+                    cout << "\nPlease login first!" << endl;
+                    break;
+                }
+                cout << "\nEnter amount for Fixed Deposit: $";
+                cin >> amount;
+                cout << "Enter tenure in years: ";
+                cin >> years;
+                fdSystem.createFixedDeposit(amount, years);
+                break;
+
+            case 9:
+                fdSystem.showFDDetails();
+                break;
+
+            case 10:
+                if (!loggedInAccount) {
+                    cout << "\nPlease login first!" << endl;
+                    break;
+                }
+                loggedInAccount->viewBalance();
+                break;
+
+            case 11:
+                if (loggedInAccount) {
+                    loggedInAccount = NULL;
+                    cout << "\nLogged out successfully!" << endl;
+                } else {
+                    cout << "\nYou are not logged in!" << endl;
+                }
+                break;
+
+            case 12:
+                cout << "\nThank you for using the Bank Management System!" << endl;
+                break;
+
+            default:
+                cout << "\nInvalid choice. Please try again." << endl;
+        }
+    } while (choice != 12);
+
+}
